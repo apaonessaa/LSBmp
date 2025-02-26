@@ -1,20 +1,22 @@
 from analyzer import Analyzer
 
 class Embedder:    
-    # LSB bitmap image bpp (bits per pixel)
-    # [+] target, bitmap data.
-    # [+] src, bitmap data source of data to insert in target.
-    # [+] layer, which layer to apply.
-    # [+] twidth & theight, size of target.
-    # [+] trsize, target row size
-    # [+] drsize, data row size
-    # [+] tBpp, target Bpp
-    # [+] dBpp, data Bpp
-
+    # LSB method
     target_analyzer=None
+    accuracy=25        
 
     def __init__(self, target_analyzer: Analyzer):
         self.target_analyzer=target_analyzer
+        self.accuracy=25 # %
+    
+    def set_accuracy(self, accuracy: int):
+        if accuracy < 0 or accuracy>100:
+            raise ValueError('<Embedder> Error@set_accuracy')
+        self.accuracy = accuracy
+
+    def get_factor(self, value: int):
+        # value : 255 = x : 100
+        return value * 100 // 255
 
     # This method works fine iff target and data byte array are the same size.
     # LSB layers: 3,2,1,0 - Alpha,RED,GREEN,BLUE
@@ -47,7 +49,8 @@ class Embedder:
         for h in range(target_height):
             offset = h * target_rowsize
             for i in range(offset, offset + target_rowsize, target_Bpp):
-                if steg_payload[i + steg_layer] < 128:
+                factor = self.get_factor(steg_payload[i + steg_layer])
+                if factor < self.accuracy:
                     target_payload[i + target_layer] &= 0xFE     # LSB - set zero
                 else:
                     target_payload[i + target_layer] |= 0x01     # LSB - set one
@@ -55,5 +58,3 @@ class Embedder:
         self.target_analyzer.set_payload(target_payload)
 
         print(f"Embedding complete.")
-
-        

@@ -65,5 +65,4 @@ class Analyzer:
     
     def exist_layer(self, layer: int):
         Bpp = self.get_Bpp()
-        print(f"Bpp: {Bpp}, layer: {layer}")
         return layer < Bpp

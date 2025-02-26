@@ -9,6 +9,7 @@ def main(target_file, src_file):
             a1 = Analyzer(target.read())
             a2 = Analyzer(src.read())
             embedder = Embedder(a1)
+            embedder.set_accuracy(35)
             embedder.apply(a2)
             target.seek(a1.get_offset())
             target.write(a1.get_payload())
@@ -20,4 +21,3 @@ if __name__ == "__main__":
     target_file = sys.argv[1]
     src_file = sys.argv[2]
     main(target_file, src_file)
-    
