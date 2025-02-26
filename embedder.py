@@ -23,7 +23,7 @@ class Embedder:
             start = h * trsize
             end = h * trsize + trsize
             for i in range(start, end, tBpp):
-                # LSB layers: 3,2,1,0 - Alpha,RED,GREE,BLUE 
+                # LSB layers: 3,2,1,0 - Alpha,RED,GREEN,BLUE
                 if data[i + layer] < 128:
                     target[i + layer] &= 0xFE     # LSB - set zero
                 else:

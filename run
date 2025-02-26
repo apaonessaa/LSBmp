@@ -1,0 +1,36 @@
+#!/usr/bin/bash
+
+target=$1
+src=$2
+
+if [ $# -ne 2 ]; then
+	echo "Error@nparams"
+	exit 1
+fi
+
+# convert
+if [[ ! -f $target ]] || [[ ! -f $src ]]; then
+	echo "Error@file exist: $target or $src do not exist"
+	exit 1
+fi
+
+# filename
+# todo
+
+# fixed sizes
+width=1222
+heigth=1228
+
+convert -resize "$width"x"$heigth"! $target out.bmp
+convert -resize "$width"x"$heigth"! $src $src.bmp
+
+#exiftool $src.bmp
+#exiftool out.bmp
+
+# LSB
+./main.py out.bmp $src.bmp
+
+
+echo "Complete."
+
+#display out.bmp

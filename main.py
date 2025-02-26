@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import sys
 from analyzer import Analyzer
 from embedder import Embedder
