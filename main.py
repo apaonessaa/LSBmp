@@ -13,11 +13,16 @@ def routine(target_file, out_file, src_file):
 
         embedder.set_target(a1)
         embedder.set_accuracy(35)
-        embedder.apply(a2)
+
+        embedder.set_target_layer(0)
+        embedder.embedding([a2],[0])
+
+        embedder.set_target_layer(1)
+        embedder.embedding([a2],[1])
 
         with open(out_file, "wb") as out: 
             out.write(a1.get_raw_image())
-            
+
     except Exception as e:
         print(f"Error@Main: {e}")
         sys.exit(1)
