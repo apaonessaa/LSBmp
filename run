@@ -14,23 +14,23 @@ if [[ ! -f $target ]] || [[ ! -f $src ]]; then
 	exit 1
 fi
 
-# filename
-# todo
+out="out.bmp"
+echo "" > $out
+echo " [+] $out file created."
 
 # fixed sizes
 width=1222
 heigth=1228
 
-convert -resize "$width"x"$heigth"! $target out.bmp
+convert -resize "$width"x"$heigth"! $target $target.bmp
 convert -resize "$width"x"$heigth"! $src $src.bmp
 
 #exiftool $src.bmp
-#exiftool out.bmp
+#exiftool $out
 
 # LSB
-./main.py out.bmp $src.bmp
+./main.py $target.bmp $out $src.bmp
 
-
-echo "Complete."
+echo " [+] completed."
 
 #display out.bmp

@@ -2,13 +2,16 @@ from analyzer import Analyzer
 
 class Embedder:    
     # LSB method
-    target_analyzer=None
+    target_analyzer: Analyzer=None
     accuracy=25        
 
-    def __init__(self, target_analyzer: Analyzer):
+    def __init__(self, target_analyzer):
         self.target_analyzer=target_analyzer
         self.accuracy=25 # %
-    
+
+    def set_target(self, target_analyzer):
+        self.target_analyzer=target_analyzer
+
     def set_accuracy(self, accuracy: int):
         if accuracy < 0 or accuracy>100:
             raise ValueError('<Embedder> Error@set_accuracy')
@@ -56,5 +59,3 @@ class Embedder:
                     target_payload[i + target_layer] |= 0x01     # LSB - set one
 
         self.target_analyzer.set_payload(target_payload)
-
-        print(f"Embedding complete.")

@@ -1,10 +1,17 @@
 import math
 
 class Analyzer:
-    raw_image=None
+    raw_image: bytes=None
+    
     def __init__(self, raw_image):
-        self.raw_image=bytearray(raw_image)
+        self.raw_image = bytearray(raw_image)
+
+    def set_raw_image(self, raw_image):
+        self.raw_image = bytearray(raw_image)
             
+    def get_raw_image(self):
+        return bytes(self.raw_image)
+
     def get_offset(self):
         # bitmap image data (pixel array) offset
         # [+] start offset:     10 bytes

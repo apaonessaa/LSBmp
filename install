@@ -1,0 +1,16 @@
+#!/usr/bin/bash
+
+exit 0
+
+if ! [ command -v convert ]; then
+    sudo apt install imagemagick
+fi
+
+if ! [ command -v exiftool ]; then
+    echo "Download the Image-ExifTool distribution from the ExifTool home page: https://exiftool.org/index.html"
+    gzip -dc Image-ExifTool-13.21.tar.gz | tar -xf -
+    cd Image-ExifTool-13.21
+    perl Makefile.PL
+    make test
+    sudo make install
+fi
