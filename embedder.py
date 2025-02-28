@@ -48,7 +48,7 @@ class Embedder:
         self.target_layer=target_layer
 
     # Target layer LSB are setted to zero
-    def set_target_zero_layer(self):
+    def clean(self):
         if self.target_analyzer is None:
             raise ValueError('<Embedder> Error@embedding')
         
@@ -69,22 +69,32 @@ class Embedder:
                 t_payload[t_channel] &= 0xFE
                 # switch to next pixel and same channel
                 t_channel += t_Bpp
+        self.target_analyzer.set_payload(t_payload)
     
-    # LSB layers: 3,2,1,0 - Alpha,RED,GREEN,BLUE
-    def embedding(self, s_analyzers, s_layers):
+    # Embedding more source in target layer at specific locations
+    def embedding(self, s_analyzers, s_layers, s_locations):
         if self.target_analyzer is None:
             raise ValueError('<Embedder> Error@embedding')
-        
-        n=min(len(s_analyzers), len(s_layers))
+
+        # testing
+        self.clean()
+
+        nsrc = len(s_analyzers)
+        nlayers = len(s_layers)
+        nlocs = len(s_locations)
+
+        n=min(nsrc, nlayers, nlocs)
         for i in range(n):
+            ws, hs = s_locations[i]
             try:
-                self._embedding(s_analyzers[i], s_layers[i])
+                self._embedding(s_analyzers[i], s_layers[i], ws, hs)
             except Exception as e:
                 print(f'<Embedder> Error@embedding: @{s_analyzers[i]}, @{s_layers[i]}')
                 print(f'{e}')
                 pass
-    
-    def _embedding(self, s_analyzer: Analyzer, s_layer: int =0):
+
+    # LSB layers: 3,2,1,0 - Alpha,RED,GREEN,BLUE
+    def _embedding(self, s_analyzer: Analyzer, s_layer=0, w_start=0, h_start=0):
         if s_analyzer is None:
             raise ValueError('<Embedder> Error@_embedding: src is null')
 
@@ -94,15 +104,15 @@ class Embedder:
         t_width, t_height = self.target_analyzer.get_size()
         s_width, s_height = s_analyzer.get_size()
 
-        # check size 
-        #if (t_width < s_width and t_height < s_height):
-        #    raise ValueError('<Embedder> Error@_embedding: incompatible size.')
-        
-        if (t_width < s_width):
-            raise ValueError('<Embedder> Error@_embedding: incompatible width.')
+        ## Check start and size
+        if w_start<0 or h_start<0:
+            raise ValueError(f"<Embedder> Error@_embedding: negative start ({w_start},{h_start}).")
 
-        if (t_height < s_height):
-            raise ValueError('<Embedder> Error@_embedding: incompatible heigth.')
+        if t_width < w_start + s_width:
+            raise ValueError(f"<Embedder> Error@_embedding: incompatible width ({s_width}). Reduce the image size or assign new start.")
+        
+        if t_height < h_start + s_height:
+            raise ValueError(f"<Embedder> Error@_embedding: incompatible height ({s_height}). Reduce the image size or assign new start.")
         
         # Target 
         t_payload = self.target_analyzer.get_payload()
@@ -117,9 +127,28 @@ class Embedder:
         s_Bpp = s_analyzer.get_Bpp()
 
         # Embedding
-        for h in range(s_height): # s_height <= t_height
+        for h in range(s_height): # s_height <= t_height, and h_start < t_height
+            # Note
+            #   The following component:
+            #       (h+h_start) * (t_rowsize + t_padding) 
+            #   define at which target height (ROW) start (default is 0).
+            #   While, the w_start at which target width (COLUMN) start the embedding (default is 0).
+            #
+            #   Example, (w_start,h_start)=(4,5)
+            #
+            #   @height
+            #   6:      ...
+            #   5:      |               |* <-- here
+            #   4:      ----------------------- ...
+            #   3:      |                   
+            #   2:      |       Pass         
+            #   1:      |                   
+            #   0:      ----------------------- ...
+            #           0   1   2   3   4   ...     @width
+            #   
+            #
+            t_offset = (h + h_start) * (t_rowsize + t_padding) + w_start * t_Bpp
             s_offset = h * (s_rowsize + s_padding)
-            t_offset = h * (t_rowsize + t_padding)
             # init t_channel and s_channel
             t_channel = t_offset + self.target_layer 
             s_channel = s_offset + s_layer 

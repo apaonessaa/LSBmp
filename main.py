@@ -35,11 +35,11 @@ def routine(target_file, out_file, src_file):
 
         embedder.set_target(a1)
         embedder.set_target_layer(0)
-        embedder.embedding([a2],[0])
+        embedder.embedding([a2],[0],[(0,0)])
         embedder.set_target_layer(1)
-        embedder.embedding([a2],[1])
+        embedder.embedding([a2],[1],[(100,220)])
         embedder.set_target_layer(2)
-        embedder.embedding([a2],[2])
+        embedder.embedding([a2],[2],[(345,500)])
 
         with open(out_file, "wb") as out: 
             out.write(a1.get_raw_image())
