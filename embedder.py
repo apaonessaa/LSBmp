@@ -1,7 +1,7 @@
 from analyzer import Analyzer
 
 class Strategy:
-    accuracy=12        #%
+    accuracy=35       #%
 
     @classmethod
     def set_accuracy(cls, accuracy: int):
@@ -46,6 +46,29 @@ class Embedder:
         if not self.target_analyzer.exist_layer(target_layer):
             raise ValueError('<Embedder> Error@set_target_layer : out-of-bound layer.')
         self.target_layer=target_layer
+
+    # Target layer LSB are setted to zero
+    def set_target_zero_layer(self):
+        if self.target_analyzer is None:
+            raise ValueError('<Embedder> Error@embedding')
+        
+        t_width, t_height = self.target_analyzer.get_size()
+
+        # Target 
+        t_payload = self.target_analyzer.get_payload()
+        t_rowsize = self.target_analyzer.get_rowsize_Bpp()
+        t_padding = self.target_analyzer.get_padding()
+        t_Bpp = self.target_analyzer.get_Bpp()
+
+        for h in range(t_height):
+            t_offset = h * (t_rowsize + t_padding)
+            # init t_channel and set channel
+            t_channel = t_offset + self.target_layer 
+            for pixel in range(t_width): 
+                # apply zero substitution 
+                t_payload[t_channel] &= 0xFE
+                # switch to next pixel and same channel
+                t_channel += t_Bpp
     
     # LSB layers: 3,2,1,0 - Alpha,RED,GREEN,BLUE
     def embedding(self, s_analyzers, s_layers):
@@ -93,27 +116,19 @@ class Embedder:
         s_padding = s_analyzer.get_padding()
         s_Bpp = s_analyzer.get_Bpp()
 
-        # Set to zero
-        for h in range(t_height):
-            t_offset = h * (t_rowsize + t_padding)
-            # s_width <= t_heigth
-            for t_pixel_offset in range(t_offset, t_offset + t_rowsize, t_Bpp): 
-                # [ ---- raw data ---- ] [ -- padding -- ] until the padding section
-                # pixel offset: [ B G R A ]
-                t_channel = t_pixel_offset + self.target_layer 
-                # apply substitution 
-                t_payload[t_channel] &= 0xFE
-
         # Embedding
         for h in range(s_height): # s_height <= t_height
             s_offset = h * (s_rowsize + s_padding)
             t_offset = h * (t_rowsize + t_padding)
-            t_channel = t_offset # init t_channel
-            for s_pixel_offset in range(s_offset, s_offset + s_rowsize, s_Bpp): # s_width <= t_heigth
-                # [ ---- raw data ---- ] [ -- padding -- ] until the padding section
-                # pixel offset: [ B G R A ]
-                s_channel = s_pixel_offset + s_layer
-                t_channel += t_Bpp + self.target_layer 
+            # init t_channel and s_channel
+            t_channel = t_offset + self.target_layer 
+            s_channel = s_offset + s_layer 
+            for pixel in range(s_width): # s_width <= t_heigth
+                # pixel: [ B G R A ]
                 # apply substitution 
                 t_payload[t_channel] = Strategy.substitution2(t_payload[t_channel], s_payload[s_channel]) 
+                # switch to next pixel and same channel
+                t_channel += t_Bpp
+                s_channel += s_Bpp
+                
         self.target_analyzer.set_payload(t_payload)

@@ -23,7 +23,7 @@ def routine(target_file, out_file, src_file):
         print("===================================")
         print()
         print("===================================")
-        print("Src")
+        print("Source")
         print("-----------------------------------")
         print(f"Image width, height: {a2.get_size()}")
         print(f"Pixel array size: {a2.get_payload_size()}")
@@ -36,10 +36,10 @@ def routine(target_file, out_file, src_file):
         embedder.set_target(a1)
         embedder.set_target_layer(0)
         embedder.embedding([a2],[0])
-        #embedder.set_target_layer(1)
-        #embedder.embedding([a2],[1])
-        #embedder.set_target_layer(2)
-        #embedder.embedding([a2],[2])
+        embedder.set_target_layer(1)
+        embedder.embedding([a2],[1])
+        embedder.set_target_layer(2)
+        embedder.embedding([a2],[2])
 
         with open(out_file, "wb") as out: 
             out.write(a1.get_raw_image())

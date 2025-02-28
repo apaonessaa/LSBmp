@@ -24,7 +24,7 @@ theigth=1228
 convert -resize "$twidth"x"$theigth"! $target $target.bmp
 
 swidth=1000
-sheigth=1000
+sheigth=1200
 convert -resize "$swidth"x"$sheigth"! $src $src.bmp
 
 #exiftool $src.bmp
