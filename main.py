@@ -7,8 +7,8 @@ from strategy import Strategy, StrategyImpl
 def routine(host_file, out_file, src_file):
     try:
         with open(src_file, "rb") as src, \
-                open(host_file, "rb") as target:
-            a1 = Analyzer(target.read())
+                open(host_file, "rb") as host:
+            a1 = Analyzer(host.read())
             a2 = Analyzer(src.read())
 
         print()
@@ -33,18 +33,19 @@ def routine(host_file, out_file, src_file):
         print("===================================")
         print()
 
-        embedder = Embedder(None)
         strategy1 = Strategy().set_accuracy(accuracy= 45).set_strategy(method= StrategyImpl.substitution)
         strategy2 = Strategy().set_accuracy(accuracy= 27).set_strategy(method= StrategyImpl.substitution2)
 
-        embedder.set_target(a1)
-        embedder.set_target_layer(0)
+        a1.clean(0).clean(1).clean(2)
+
+        embedder = Embedder()
+        embedder.set_host(a1).set_host_layer(0)
         embedder.embedding([a2,a2,a2],[0,1,2],[(0,0),(100,100),(250,235)],strategy1)
 
-        embedder.set_target_layer(1)
+        embedder.set_host_layer(1)
         embedder.embedding([a2,a2,a2,a2,a2],[1,0,2,0,1],[(100,220),(0,100),(800,345),(90,700),(500,900)],strategy2)
 
-        embedder.set_target_layer(2)
+        embedder.set_host_layer(2)
         embedder.embedding([a2,a2],[2,2],[(345,500),(0,0)],strategy2)
 
         with open(out_file, "wb") as out: 

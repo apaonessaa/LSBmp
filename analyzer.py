@@ -1,7 +1,7 @@
 import math
 
 class Analyzer:
-    raw_image: bytes=None
+    raw_image: bytearray=[]
     
     def __init__(self, raw_image):
         self.raw_image = bytearray(raw_image)
@@ -106,4 +106,27 @@ class Analyzer:
         Bpp = self.get_Bpp()
         row_padding = (4 - (width * Bpp) % 4)  
         return row_padding % 4  
+    
+    # set LSB raw image to zero
+    def clean(self, layer):
+        if not self.exist_layer(layer):
+            raise ValueError('Error@clean: out-of-bound layer.')
+        
+        t_width, t_height = self.get_size()
+        t_payload = self.get_payload()
+        t_rowsize = self.get_rowsize_Bpp()
+        t_padding = self.get_padding()
+        t_Bpp = self.get_Bpp()
+
+        for h in range(t_height):
+            t_offset = h * (t_rowsize + t_padding)
+            # init t_channel and set channel
+            t_channel = t_offset + layer 
+            for pixel in range(t_width): 
+                # apply zero substitution 
+                t_payload[t_channel] &= 0xFE
+                # switch to next pixel and same channel
+                t_channel += t_Bpp
+        self.set_payload(t_payload)
+        return self
 
