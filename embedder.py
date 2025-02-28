@@ -1,38 +1,7 @@
 from analyzer import Analyzer
-
-class Strategy:
-    accuracy=35       #%
-
-    @classmethod
-    def set_accuracy(cls, accuracy: int):
-        if accuracy < 0 or accuracy>100:
-            raise ValueError('<Embedder> Error@set_accuracy')
-        cls.accuracy = accuracy
-
-    def get_factor(value: int):
-        # value : 255 = x : 100%
-        return value * 100 // 255 if value>0 else 0
-    
-    # (1) strategy : LSB substitution if factor(src_value) > accuracy then 1 else 0
-    @classmethod
-    def substitution(cls, tvalue, svalue):
-        factor = cls.get_factor(svalue)
-        if factor < cls.accuracy:
-            tvalue &= 0xFE    
-        else:
-            tvalue |= 0x01   
-        return tvalue
-    
-    # (2) strategy : LSB substitution if factor(src_value) > accuracy then 1 else pass
-    @classmethod
-    def substitution2(cls, tvalue, svalue):
-        factor = cls.get_factor(svalue)
-        if factor >= cls.accuracy:
-            tvalue |= 0x01 
-        return tvalue
+from strategy import Strategy
 
 class Embedder:    
-    # LSB method
     target_analyzer: Analyzer=None
     target_layer: int=0
 
@@ -72,12 +41,12 @@ class Embedder:
         self.target_analyzer.set_payload(t_payload)
     
     # Embedding more source in target layer at specific locations
-    def embedding(self, s_analyzers, s_layers, s_locations):
+    def embedding(self, s_analyzers, s_layers, s_locations, strategy):
         if self.target_analyzer is None:
             raise ValueError('<Embedder> Error@embedding')
 
         # testing
-        self.clean()
+        #self.clean()
 
         nsrc = len(s_analyzers)
         nlayers = len(s_layers)
@@ -87,14 +56,14 @@ class Embedder:
         for i in range(n):
             ws, hs = s_locations[i]
             try:
-                self._embedding(s_analyzers[i], s_layers[i], ws, hs)
+                self._embedding(s_analyzers[i], strategy, s_layers[i], ws, hs)
             except Exception as e:
                 print(f'<Embedder> Error@embedding: @{s_analyzers[i]}, @{s_layers[i]}')
                 print(f'{e}')
                 pass
 
     # LSB layers: 3,2,1,0 - Alpha,RED,GREEN,BLUE
-    def _embedding(self, s_analyzer: Analyzer, s_layer=0, w_start=0, h_start=0):
+    def _embedding(self, s_analyzer: Analyzer, strategy: Strategy, s_layer=0, w_start=0, h_start=0):
         if s_analyzer is None:
             raise ValueError('<Embedder> Error@_embedding: src is null')
 
@@ -155,7 +124,7 @@ class Embedder:
             for pixel in range(s_width): # s_width <= t_heigth
                 # pixel: [ B G R A ]
                 # apply substitution 
-                t_payload[t_channel] = Strategy.substitution2(t_payload[t_channel], s_payload[s_channel]) 
+                t_payload[t_channel] = strategy.apply(t_payload[t_channel], s_payload[s_channel]) 
                 # switch to next pixel and same channel
                 t_channel += t_Bpp
                 s_channel += s_Bpp
