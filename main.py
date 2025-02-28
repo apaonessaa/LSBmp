@@ -4,7 +4,7 @@ from analyzer import Analyzer
 from embedder import Embedder
 from strategy import Strategy, StrategyImpl
 
-def routine(host_file, out_file, src_file):
+def routine(host_file, src_file):
     try:
         with open(src_file, "rb") as src, \
                 open(host_file, "rb") as host:
@@ -48,15 +48,14 @@ def routine(host_file, out_file, src_file):
         embedder.set_host_layer(2)
         embedder.embedding([a2,a2],[2,2],[(345,500),(0,0)],strategy2)
 
-        with open(out_file, "wb") as out: 
-            out.write(a1.get_raw_image())
-
+        with open(host_file, "wb") as host:    
+            host.write(a1.get_raw_image())
+            
     except Exception as e:
         print(f"Error@Main: {e}")
         sys.exit(1)
 
 if __name__ == "__main__":
     host_file = sys.argv[1]
-    out_file = sys.argv[2]
-    src_file = sys.argv[3]
-    routine(host_file, out_file, src_file)
+    src_file = sys.argv[2]
+    routine(host_file, src_file)

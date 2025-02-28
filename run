@@ -1,38 +1,79 @@
 #!/usr/bin/bash
+USAGE="$0 <host image> <src image> [-H <h_width>x<h_height>] [-S <src_width>x<src_height>]"
 
-target=$1
+if [ $# -lt 2 ]; then
+    echo "$USAGE"
+    exit 1
+fi
+
+host=$1
 src=$2
+shift 2  # Remove them from argument list
 
-if [ $# -ne 2 ]; then
-	echo "Error@nparams"
-	exit 1
+# Validate image files
+if [[ ! -f $host ]]; then
+    echo "[-] The image $host does not exist."
+    exit 1
 fi
 
-# convert
-if [[ ! -f $target ]] || [[ ! -f $src ]]; then
-	echo "Error@file exist: $target or $src do not exist"
-	exit 1
+if [[ ! -f $src ]]; then
+    echo "[-] The image $src does not exist."
+    exit 1
 fi
 
-out="out.bmp"
-echo "" > $out
-echo " [+] $out file created."
+# Default values
+host_size=""
+src_size=""
 
-# fixed sizes
-twidth=1222
-theigth=1228
-convert -resize "$twidth"x"$theigth"! $target $target.bmp
+# Parse options
+OPTIONS="H:S:"
+while getopts ${OPTIONS} opt; do
+    case ${opt} in
+        H) host_size=${OPTARG} ;;
+        S) src_size=${OPTARG} ;;
+        :)
+            echo "[-] Option -$OPTARG requires an argument."
+            exit 1
+            ;;
+        \?)
+            echo "[-] Invalid option: -$OPTARG."
+            echo "$USAGE"
+            exit 1
+            ;;
+    esac
+done
 
-swidth=250
-sheigth=250
-convert -resize "$swidth"x"$sheigth"! $src $src.bmp
+# Set default value or validate the format "WIDTHxHEIGHT" 
+if [[ -z "$host_size" ]]; then
+    host_size="1222x1228"
+elif [[ ! "$host_size" =~ ^[0-9]+x[0-9]+$ ]]; then
+    echo "[-] Invalid format for -H. Use WIDTHxHEIGHT (e.g., 1920x1080)."
+    echo "[-] Host default WIDTHxHEIGHT is 1222x1228."
+    exit 1
+fi
 
-#exiftool $src.bmp
-#exiftool $out
+if [[ -z "$src_size" ]]; then
+    src_size="100x100"
+elif [[ ! "$src_size" =~ ^[0-9]+x[0-9]+$ ]]; then
+    echo "[-] Invalid format for -S. Use WIDTHxHEIGHT (e.g., 800x600)."
+    echo "[-] Source default WIDTHxHEIGHT is 100x100."
+    exit 1
+fi
 
-# LSB
-./main.py $target.bmp $out $src.bmp
+echo "[+] Host Image: $host"
+echo "[+] Src Image: $src"
+echo "[+] Host Size: $host_size"
+echo "[+] Src Size: $src_size"
 
-echo " [+] completed."
+# Convert images
+convert -resize "$host_size!" "$host" "$host.bmp"
+convert -resize "$src_size!" "$src" "$src.bmp"
 
-#display out.bmp
+echo "[+] Host Image $host.bmp converted to BMP format"
+echo "[+] Src Image: $src.bmp converted to BMP format"
+
+./main.py "$host.bmp" "$src.bmp"
+
+echo "[+] Output file: $host.bmp"
+
+echo "[+] Complete."
