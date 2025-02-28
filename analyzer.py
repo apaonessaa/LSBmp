@@ -35,20 +35,27 @@ class Analyzer:
     
     def get_Bpp(self):
         # bitmap image Bpp (Bytes per pixel)
+        # Note: 1, 4 o 8 bits per pixel
         bpp = self.get_bpp()
-        return bpp // 8
+        return max(1, bpp // 8)
     
-    def get_rowsize(self):
-        width, _ = self.get_size()
-        bpp = self.get_bpp()
+    def get_rowsize_bpp(self):
         # bitmap image row size in pixel
         # [+] width, image width expressed in pixels
         # [+] bpp, bits per pixel
-        return math.ceil(bpp * width / 32) * 4
+        width, _ = self.get_size()
+        bpp = self.get_bpp()
+        return bpp * width
     
+    def get_rowsize_Bpp(self):
+        # bitmap image row size in pixel
+        row_size_bpp = self.get_rowsize_bpp()
+        return math.ceil(row_size_bpp / 8)
+
     def get_payload_size(self):
         # bitmap image size in pixel, pixel array size
-        rowsize = self.get_rowsize() 
+        # rawdata + padding
+        rowsize = self.get_rowsize_Bpp() + self.get_padding()
         _, height = self.get_size()
         return height * rowsize
     
@@ -73,3 +80,30 @@ class Analyzer:
     def exist_layer(self, layer: int):
         Bpp = self.get_Bpp()
         return layer < Bpp
+    
+    # Padding
+    # Bitmap pixel data is stored in rows (also known as strides or scan lines).
+    # Each row's size must be a multiple of 4 bytes (a 32-bit DWORD).
+    # If the row's raw data is not already a multiple of 4 bytes, padding bytes are added at the end.
+    def get_padding(self):  
+        # Maximum padding size: 3 bytes (since a full 4-byte padding block is unnecessary).
+        #
+        # Example: 
+        #   - 24-bit BMP (Bpp = 3 bytes per pixel), Width = 1 pixel
+        #   - Raw row size = 1 * 3 = 3 bytes (not a multiple of 4)
+        #   - (1) Compute remainder: 3 bytes % 4 = 3
+        #   - (2) Compute padding: 4 - 3 = 1
+        #   - (3) Apply final mod 4 to ensure padding is never 4: (4 - 3) % 4 = 1
+        #   - Final row structure: [3 bytes pixel data] + [1 byte padding]
+        #
+        # General steps:
+        #   (1) Compute raw row size: width * Bpp
+        #   (2) Compute required padding: 4 - (raw row size % 4)
+        #   (3) Apply mod 4 to prevent a full 4-byte padding block (unnecessary)
+        #
+        # If the row size is already a multiple of 4, the formula ensures padding = 0.
+        width, _ = self.get_size()
+        Bpp = self.get_Bpp()
+        row_padding = (4 - (width * Bpp) % 4)  
+        return row_padding % 4  
+

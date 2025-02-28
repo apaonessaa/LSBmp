@@ -26,28 +26,27 @@ class Embedder:
     
     # LSB layers: 3,2,1,0 - Alpha,RED,GREEN,BLUE
 
-    def embedding(self, src_analyzers, src_layers):
+    def embedding(self, src_analyzers):
         if self.target_analyzer is None:
             raise ValueError('<Embedder> Error@embedding')
-        
-        n=min(len(src_analyzers),len(src_layers))
-        for i in range(n):
+
+        for src_analyzer in src_analyzers:
             try:
-                self.single_embedding(src_analyzers[i], src_layers[i])
+                self.single_embedding(src_analyzer)
             except Exception as e:
-                print(f"<Embedder> Error@embedding: index {i}")
+                print(f"<Embedder> Error@embedding: @{src_analyzer}, {e}")
                 pass
 
-    # This method works fine iff target and data byte array are the same size.
-    def single_embedding(self, src_analyzer: Analyzer, src_layer: int =0):
+    # This method works fine iff target and data byte array are the same size and same Bpp.
+    def single_embedding(self, src_analyzer: Analyzer):
         if self.target_analyzer is None or src_analyzer is None:
             raise ValueError('<Embedder> Error@single_embedding')
 
         if not self.target_analyzer.exist_layer(self.target_layer):
             raise ValueError('<Embedder> Error@single_embedding : out-of-bound layer of the target.')
 
-        if not src_analyzer.exist_layer(src_layer):
-            raise ValueError('<Embedder> Error@single_embedding : out-of-bound layer of the info.')
+        #if not src_analyzer.exist_layer(src_layer):
+        #    raise ValueError('<Embedder> Error@single_embedding : out-of-bound layer of the info.')
 
         target_payload_size = self.target_analyzer.get_payload_size()
         steg_payload_size = src_analyzer.get_payload_size()
@@ -58,7 +57,8 @@ class Embedder:
         # Target 
         target_payload = self.target_analyzer.get_payload()
         _, target_height = self.target_analyzer.get_size()
-        target_rowsize = self.target_analyzer.get_rowsize()
+        target_rowsize = self.target_analyzer.get_rowsize_Bpp()
+        target_padding = self.target_analyzer.get_padding()
         target_Bpp = self.target_analyzer.get_Bpp()
 
         # Payload 
@@ -66,9 +66,11 @@ class Embedder:
 
         # Embedding
         for h in range(target_height):
-            offset = h * target_rowsize
-            for i in range(offset, offset + target_rowsize, target_Bpp):
-                target_payload[i + self.target_layer] = self.substitution2(target_payload[i + self.target_layer], src_payload[i + src_layer])
+            offset = h * (target_rowsize + target_padding) # h * target_rowsize + h * target_padding
+            for pixel_offset in range(offset, offset + target_rowsize, target_Bpp):
+                # pixel offset: [ B G R A ]
+                pixel = pixel_offset + self.target_layer    # set which channel
+                target_payload[pixel] = self.substitution(target_payload[pixel], src_payload[pixel]) 
         self.target_analyzer.set_payload(target_payload)
 
     # (1) strategy : LSB substitution if factor(src_value) > accuracy then 1 else 0
