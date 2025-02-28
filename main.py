@@ -11,9 +11,6 @@ def routine(target_file, out_file, src_file):
             a1 = Analyzer(target.read())
             a2 = Analyzer(src.read())
 
-        embedder.set_target(a1)
-        embedder.set_accuracy(35)
-
         print()
         print("===================================")
         print("Target")
@@ -36,12 +33,13 @@ def routine(target_file, out_file, src_file):
         print("===================================")
         print()
 
+        embedder.set_target(a1)
         embedder.set_target_layer(0)
-        embedder.embedding([a2])
-        embedder.set_target_layer(1)
-        embedder.embedding([a2])
-        embedder.set_target_layer(2)
-        embedder.embedding([a2])
+        embedder.embedding([a2],[0])
+        #embedder.set_target_layer(1)
+        #embedder.embedding([a2],[1])
+        #embedder.set_target_layer(2)
+        #embedder.embedding([a2],[2])
 
         with open(out_file, "wb") as out: 
             out.write(a1.get_raw_image())

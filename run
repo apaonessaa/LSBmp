@@ -19,11 +19,13 @@ echo "" > $out
 echo " [+] $out file created."
 
 # fixed sizes
-width=1222
-heigth=1228
+twidth=1222
+theigth=1228
+convert -resize "$twidth"x"$theigth"! $target $target.bmp
 
-convert -resize "$width"x"$heigth"! $target $target.bmp
-convert -resize "$width"x"$heigth"! $src $src.bmp
+swidth=1000
+sheigth=1000
+convert -resize "$swidth"x"$sheigth"! $src $src.bmp
 
 #exiftool $src.bmp
 #exiftool $out
