@@ -59,7 +59,17 @@ Run the `run` script to embed a source image into a host image:
 
 ## Output
 
-After execution, the modified host image is saved as `<host_image>.bmp` in the same directory.
+After execution, the modified host image is saved as `out.bmp` in the same directory.
+
+## Video Demonstration
+
+Below is a demonstration of the embedding process and the resulting image:
+
+
+// insert video
+
+
+Note: The quality of the embedded information in the host image depends on several factors, including the embedding accuracy, the selected LSB layer, the number of altered bits, and the applied embedding strategy. These factors influence both the visibility of the embedded content and the preservation of the host image quality.
 
 ## Roadmap
 
@@ -70,9 +80,4 @@ After execution, the modified host image is saved as `<host_image>.bmp` in the s
 
 ## License
 
-This project is licensed under the MIT License. Feel free to contribute and improve it!
-
----
-
-For further details and updates, please refer to the repository documentation.
-
+This project is licensed under the MIT License.

@@ -36,8 +36,8 @@ def routine(host_file, src_file):
         # Embedding Pipeline
         print("="*120)
         print('Pipeline')
-        strategy1 = Strategy().set_accuracy(accuracy= 45).set_strategy(method= StrategyImpl.substitution)
-        strategy2 = Strategy().set_accuracy(accuracy= 27).set_strategy(method= StrategyImpl.substitution2)
+        strategy1 = Strategy().set_accuracy(accuracy= 35).set_strategy(method= StrategyImpl.substitution)
+        strategy2 = Strategy().set_accuracy(accuracy= 50).set_strategy(method= StrategyImpl.substitution2)
 
         a1.clean(0).clean(1).clean(2)
 

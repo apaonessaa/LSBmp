@@ -74,6 +74,8 @@ echo "[+] Src Image: $src.bmp converted to BMP format"
 
 ./main.py "$host.bmp" "$src.bmp"
 
-echo "[+] Output file: $host.bmp"
+rm -f $src.bmp && echo "[+] Deleted $src.bmp file"
+
+mv $host.bmp out.bmp && echo "[+] Output file: out.bmp"
 
 echo "[+] Complete."
