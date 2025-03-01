@@ -12,27 +12,30 @@ def routine(host_file, src_file):
             a2 = Analyzer(src.read())
 
         print()
-        print("===================================")
+        print("="*120)
         print("Host")
-        print("-----------------------------------")
+        print("-"*120)
         print(f"Image width, height: {a1.get_size()}")
         print(f"Pixel array size: {a1.get_payload_size()}")
         print(f"Row size: {a1.get_rowsize_Bpp()}")
         print(f"Padding: {a1.get_padding()}")
         print(f"Bpp: {a1.get_Bpp()}")
-        print("===================================")
+        print("="*120)
         print()
-        print("===================================")
+        print("="*120)
         print("Source")
-        print("-----------------------------------")
+        print("-"*120)
         print(f"Image width, height: {a2.get_size()}")
         print(f"Pixel array size: {a2.get_payload_size()}")
         print(f"Row size: {a2.get_rowsize_Bpp()}")
         print(f"Padding: {a2.get_padding()}")
         print(f"Bpp: {a2.get_Bpp()}")
-        print("===================================")
+        print("="*120)
         print()
 
+        # Embedding Pipeline
+        print("="*120)
+        print('Pipeline')
         strategy1 = Strategy().set_accuracy(accuracy= 45).set_strategy(method= StrategyImpl.substitution)
         strategy2 = Strategy().set_accuracy(accuracy= 27).set_strategy(method= StrategyImpl.substitution2)
 
@@ -47,6 +50,7 @@ def routine(host_file, src_file):
 
         embedder.set_host_layer(2)
         embedder.embedding([a2,a2],[2,2],[(345,500),(0,0)],strategy2)
+        print("="*120)
 
         with open(host_file, "wb") as host:    
             host.write(a1.get_raw_image())
