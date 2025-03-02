@@ -9,7 +9,6 @@ LSBmp is a tool that enables image embedding using the Least Significant Bit (LS
 - **Customizable Strategies**: Apply different embedding strategies with adjustable accuracy.
 - **BMP Format Support**: Works with BMP images for precise bit manipulation.
 - **Automatic Image Conversion**: Uses ImageMagick to convert images to the required BMP format.
-- **Analysis Tools**: Provides image analysis using `exiftool` (optional).
 - **Upcoming Enhancements**:
   - Define embedding layers via command-line arguments.
   - Allow selection of embedding strategies dynamically.
