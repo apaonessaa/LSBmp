@@ -68,18 +68,6 @@ If you want to run the main `lsbmp` script directly:
 
 After execution, the modified host image is saved as `out.bmp` in the same directory.
 
-## Video Demonstration
-
-Below is a demonstration of the embedding process and the resulting image:
-
-
-
-https://github.com/user-attachments/assets/32d2a1ba-1c37-4ea3-a6e5-796256061c04
-
-
-
-Note: The quality of the embedded information in the host image depends on several factors, including the embedding accuracy, the selected LSB layer, the number of altered bits, and the applied embedding strategy. These factors influence both the visibility of the embedded content and the preservation of the host image quality.
-
 ## Roadmap
 
 - **Choose which LSB to alter**: Add for each RGB layer which bit you want to alter.
@@ -92,3 +80,6 @@ Note: The quality of the embedded information in the host image depends on sever
 
 This project is licensed under the MIT License.
 
+---
+
+See more information on the Github page.
