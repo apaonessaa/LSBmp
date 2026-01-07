@@ -53,11 +53,11 @@ If you want to run the main `lsbmp` script directly:
 
 **Note**: Ensure that the **host image** and the **src image** are BMP file image format.
 
-### Project Breakdown
+## Project Breakdown
 
 - **run**: Bash script that handles image validation, conversion (to BMP), and execution (It is a support scripts to simplify the watermarked image creation process).
 - **lsbmp**: Python script that executes embedding.
-- **pipeline.py**: Defines a custom embedding pipeline stages and can be manipulated by the user to define their own embedding strategy.
+- **pipeline.py**: Defines a **custom embedding pipeline** and can be manipulated by the user to define their own embedding strategy.
   - Which RGB layer to clean? (All pixels to zero)
   - Where to place the SRC image inside the host object? (You choose the layer and fix the coordinates of the pixels to be altered)
 - **analyzer.py**: Analyzes BMP images for size, padding, and bit depth.
@@ -67,6 +67,8 @@ If you want to run the main `lsbmp` script directly:
 ## Output
 
 After execution, the modified host image is saved as `out.bmp` in the same directory.
+
+**Note**: The quality of the embedded information in the host image depends on several factors, including the embedding accuracy, the selected LSB layer, the number of altered bits, and the applied embedding strategy. These factors influence both the visibility of the embedded content and the preservation of the host image quality.
 
 ## Roadmap
 
