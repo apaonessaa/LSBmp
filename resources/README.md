@@ -50,9 +50,3 @@ If you want to run the main **lsbmp** script directly:
 The result is the modified host image.
 
 The quality of the embedded information in the host image depends on several factors, including the embedding accuracy, the selected LSB layer, the number of altered bits, and the applied embedding strategy. These factors influence both the visibility of the embedded content and the preservation of the host image quality.
-
-## License
-
-This project is licensed under the MIT License.
-
-See more information on the Github page.
