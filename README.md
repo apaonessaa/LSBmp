@@ -64,8 +64,6 @@ If you want to run the main **lsbmp** script directly:
 ./lsbmp --host-file <host_image> --src-file <src_image> [-d, --debug]
 ```
 
-https://github.com/user-attachments/assets/dddc5038-6ef5-4686-871e-deda101d01c9
-
 > Note: Ensure that the **host image** and the **src image** are BMP file image format.
 
 The result is the modified host image.
