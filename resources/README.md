@@ -4,6 +4,8 @@ LSBmp is a advanced tool that enables image embedding using the Least Significan
 
 It works with BMP images for precise bit manipulation.
 
+![LSBmp](./LSBmp.png)
+
 ## Features
 
 - **Image Embedding**: Embed a source image into a host image using LSB techniques.
