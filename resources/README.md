@@ -1,16 +1,19 @@
 # LSBmp - Least Significant Bit Image Embedding
+---
 
 LSBmp is a advanced tool that enables image embedding using the Least Significant Bit (LSB) technique. It takes a host image and embeds a source image within it, leveraging the LSB layers of the BMP format. This project is designed for research and experimentation in steganography and image manipulation.
 
 It works with BMP images for precise bit manipulation.
 
 ## Features
+---
 
 - **Image Embedding**: Embed a source image into a host image using LSB techniques.
 - **Multiple Layers**: Modify different layers (Red, Green, Blue) for embedding.
 - **Customizable Strategies**: Apply different embedding strategies with adjustable accuracy.
 
 ## Requirements
+---
 
 Before running the project, ensure you have the following tools installed:
 
@@ -19,6 +22,7 @@ Before running the project, ensure you have the following tools installed:
 - **ExifTool** (optional, for image metadata analysis)
 
 ## Installation
+---
 
 Clone this repository and navigate to the project directory:
 
@@ -28,6 +32,7 @@ cd LSBmp
 ```
 
 ## Usage with BMP convertor
+---
 
 Run the `run` script to embed a source image into a host image:
 
@@ -44,6 +49,7 @@ Run the `run` script to embed a source image into a host image:
 ```
 
 ## Usage of the core script
+---
 
 If you want to run the main `lsbmp` script directly:
 
@@ -65,10 +71,12 @@ If you want to run the main `lsbmp` script directly:
 - **strategy.py**: Defines embedding strategies and accuracy levels.
 
 ## Output
+---
 
 After execution, the modified host image is saved as `out.bmp` in the same directory.
 
 ## Roadmap
+---
 
 - **Choose which LSB to alter**: Add for each RGB layer which bit you want to alter.
 - **Add alternative to the "cleaning" of the RGB layer with only zeros to increase the imperceptibility property of the watermark**.
@@ -77,9 +85,7 @@ After execution, the modified host image is saved as `out.bmp` in the same direc
 - **Enhanced Error Handling**: Improve robustness in case of incorrect input parameters.
 
 ## License
-
-This project is licensed under the MIT License.
-
 ---
+This project is licensed under the MIT License.
 
 See more information on the Github page.
