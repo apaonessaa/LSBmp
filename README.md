@@ -29,44 +29,6 @@ git clone https://github.com/yourusername/LSBmp.git
 cd LSBmp
 ```
 
-## Usage with BMP convertor
-
-Run the `run` script to embed a source image into a host image:
-
-```sh
-./run <host_image> <src_image> [-H <host_width>x<host_height>] [-S <src_width>x<src_height>]
-```
-
-**Note**: Ensure `imagemagick` is installed and properly configured.
-
-
-Below is a demonstration of the embedding process and the resulting image via `run`:
-
-
-
-https://github.com/user-attachments/assets/471026d4-8060-478c-bf41-d0ec0e00c15c
-
-
-
-## Usage of the core script
-
-If you want to run the main `lsbmp` script directly:
-
-```sh
-./lsbmp --host-file <host_image> --src-file <src_image> [-d, --debug]
-```
-
-**Note**: Ensure that the **host image** and the **src image** are BMP file image format.
-
-
-Below is a demonstration of the embedding process and the resulting image via `lsbmp`:
-
-
-
-https://github.com/user-attachments/assets/dddc5038-6ef5-4686-871e-deda101d01c9
-
-
-
 ## Project Breakdown
 
 - **run**: Bash script that handles image validation, conversion (BMP image format), and execution (It is a support scripts to simplify the watermarked image creation process).
@@ -78,11 +40,37 @@ https://github.com/user-attachments/assets/dddc5038-6ef5-4686-871e-deda101d01c9
 - **embedder.py**: Handles embedding logic with different strategies.
 - **strategy.py**: Defines embedding strategies and accuracy levels.
 
-## Output
+## Usage
 
-After execution, the modified host image is saved as `out.bmp` in the same directory.
+### BMP convertor and LSBmp execution
 
-**Note**: The quality of the embedded information in the host image depends on several factors, including the embedding accuracy, the selected LSB layer, the number of altered bits, and the applied embedding strategy. These factors influence both the visibility of the embedded content and the preservation of the host image quality.
+Run the **run** script to embed a source image into a host image:
+
+```sh
+./run <host_image> <src_image> [-H <host_width>x<host_height>] [-S <src_width>x<src_height>]
+```
+
+https://github.com/user-attachments/assets/471026d4-8060-478c-bf41-d0ec0e00c15c
+
+> Note: Ensure **imagemagick** is installed and properly configured.
+
+After execution, the modified host image is saved as **out.bmp** in the same directory.
+
+### LSBmp execution
+
+If you want to run the main **lsbmp** script directly:
+
+```sh
+./lsbmp --host-file <host_image> --src-file <src_image> [-d, --debug]
+```
+
+https://github.com/user-attachments/assets/dddc5038-6ef5-4686-871e-deda101d01c9
+
+> Note: Ensure that the **host image** and the **src image** are BMP file image format.
+
+The result is the modified host image.
+
+The quality of the embedded information in the host image depends on several factors, including the embedding accuracy, the selected LSB layer, the number of altered bits, and the applied embedding strategy. These factors influence both the visibility of the embedded content and the preservation of the host image quality.
 
 ## Roadmap
 
