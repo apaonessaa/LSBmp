@@ -48,7 +48,7 @@ Run the `run` script to embed a source image into a host image:
 If you want to run the main `lsbmp` script directly:
 
 ```sh
-./lsbmp --host-image <host_image> --src-image <src_image> [-d, --debug]
+./lsbmp --host-file <host_image> --src-file <src_image> [-d, --debug]
 ```
 
 **Note**: Ensure that the **host image** and the **src image** are BMP file image format.
