@@ -1,0 +1,33 @@
+#!/usr/bin/python3
+import sys
+from argparse import ArgumentParser
+
+from src.pipeline import Pipeline
+
+if __name__ == "__main__":
+    parser = ArgumentParser(
+        prog="LSBmp", 
+        description="LSBmp is a advanced tool that enables image (BMP) embedding using the Least Significant Bit (LSB) technique.",
+        epilog="Example: ./lsbmp --host-file images/tiger.jpg.bmp --src-file images/cat.jpeg.bmp -d"
+    )
+
+    parser.add_argument("--host-file",
+                        help="Host Image filename.",
+                        type=str, required=True)
+    parser.add_argument("--src-file",
+                        help="Source Image filename.",
+                        type=str, required=True)
+    parser.add_argument("-d", "--debug",
+                        help="debug",
+                        action="store_true")
+
+    args = parser.parse_args()
+    
+    """
+    print(args.host_file)
+    print(args.src_file)
+    print(args.debug)
+    """
+
+    p = Pipeline(args.host_file, args.src_file, args.debug)
+    p.apply()

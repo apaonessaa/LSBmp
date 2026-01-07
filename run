@@ -72,7 +72,7 @@ convert -resize "$src_size!" "$src" "$src.bmp"
 echo "[+] Host Image $host.bmp converted to BMP format"
 echo "[+] Src Image: $src.bmp converted to BMP format"
 
-./main.py "$host.bmp" "$src.bmp"
+./lsbmp --host-file "$host.bmp" --src-file "$src.bmp" --debug
 
 rm -f $src.bmp && echo "[+] Deleted $src.bmp file"
 

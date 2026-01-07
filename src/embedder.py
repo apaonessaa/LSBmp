@@ -1,5 +1,5 @@
-from analyzer import Analyzer
-from strategy import Strategy
+from src.analyzer import Analyzer
+from src.strategy import Strategy
 
 class Embedder:    
     """
@@ -7,8 +7,12 @@ class Embedder:
     It allows for setting the host image, defining the target layer for embedding, and embedding multiple images at specific locations.
     """
 
-    host_analyzer: Analyzer = None
-    host_layer: int = 0
+    host_analyzer: Analyzer=None
+    host_layer: int=0
+    debug: bool=False
+
+    def __init__(self, debug):
+        self.debug = debug
 
     def set_host(self, host_analyzer: Analyzer):
         """Assigns the host image analyzer."""
@@ -29,18 +33,20 @@ class Embedder:
 
         n = min(len(s_analyzers), len(s_layers), len(s_locations))
 
-        print('-' * 120 + '\n')
+        if (self.debug):
+            print('\n' + '-' * 120)
         for i in range(n):
             ws, hs = s_locations[i]
             try:
                 self._embedding(s_analyzers[i], strategy, s_layers[i], ws, hs)
-                print(f'[+] Successfully embedded source {i}: Layer={s_layers[i]}, Position={s_locations[i]}, Strategy={strategy}')
-                print()
+                if (self.debug):
+                    print(f'[+] Successfully embedded source {i}: Layer={s_layers[i]}, Position={s_locations[i]}, Strategy={strategy}')
             except Exception as e:
                 print(f'[-] Error embedding source {i}: Layer={s_layers[i]}, Position={s_locations[i]}, Strategy={strategy}')
                 print(f'    Exception: {e}')
                 print(f'    Skipping task {i}...')
-        print('-' * 120)
+        if(self.debug):
+            print('-' * 120 + '\n')
 
     def _embedding(self, s_analyzer: Analyzer, strategy: Strategy, s_layer=0, w_start=0, h_start=0):
         """Handles the actual embedding process at the pixel level."""

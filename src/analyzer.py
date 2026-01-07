@@ -2,9 +2,11 @@ import math
 
 class Analyzer:
     raw_image: bytearray=[]
-    
-    def __init__(self, raw_image):
+    debug: bool=False
+
+    def __init__(self, raw_image, debug):
         self.raw_image = bytearray(raw_image)
+        self.debug = debug
 
     def set_raw_image(self, raw_image):
         self.raw_image = bytearray(raw_image)
@@ -128,5 +130,7 @@ class Analyzer:
                 # switch to next pixel and same channel
                 t_channel += t_Bpp
         self.set_payload(t_payload)
+        if (self.debug):
+            print(f"The layer {layer} is cleaned.")
         return self
 

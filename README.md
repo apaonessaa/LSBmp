@@ -1,6 +1,6 @@
 # LSBmp - Least Significant Bit Image Embedding
 
-LSBmp is a tool that enables image embedding using the Least Significant Bit (LSB) technique. It takes a host image and embeds a source image within it, leveraging the LSB layers of the BMP format. This project is designed for research and experimentation in steganography and image manipulation.
+LSBmp is a advanced tool that enables image embedding using the Least Significant Bit (LSB) technique. It takes a host image and embeds a source image within it, leveraging the LSB layers of the BMP format. This project is designed for research and experimentation in steganography and image manipulation.
 
 ## Features
 
@@ -50,8 +50,11 @@ Run the `run` script to embed a source image into a host image:
 
 ### Script Breakdown
 
-- **run**: Bash script that handles image validation, conversion, and execution.
-- **main.py**: Core Python script that executes the embedding pipeline.
+- **run**: Bash script that handles image validation, conversion (to BMP), and execution (It is a support scripts to simplify the watermarked image creation process).
+- **lsbmp**: Python script that executes embedding.
+- **pipeline.py**: Defines a custom embedding pipeline stages and can be manipulated by the user to define their own embedding strategy.
+  - Which RGB layer to clean? (All pixels to zero)
+  - Where to place the SRC image inside the host object? (You choose the layer and fix the coordinates of the pixels to be altered)
 - **analyzer.py**: Analyzes BMP images for size, padding, and bit depth.
 - **embedder.py**: Handles embedding logic with different strategies.
 - **strategy.py**: Defines embedding strategies and accuracy levels.
@@ -74,9 +77,10 @@ Note: The quality of the embedded information in the host image depends on sever
 
 ## Roadmap
 
-- **Command-line Strategy Selection**: Users will be able to specify which embedding strategy to use.
-- **Layer Customization**: Allow users to define which LSB layer to modify from the command line.
-- **Multiple Strategies in a Single Execution**: Users will be able to define multiple strategies to enhance flexibility.
+- **Choose which LSB to alter**: Add for each RGB layer which bit you want to alter.
+- **Add alternative to the "cleaning" of the RGB layer with only zeros to increase the imperceptibility property of the watermark**.
+- **Multiple Source Images to Embedding**.
+- **Simplify Pipeline Definition**: via GUI?.
 - **Enhanced Error Handling**: Improve robustness in case of incorrect input parameters.
 
 ## License
