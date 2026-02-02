@@ -1,130 +1,189 @@
-from src.analyzer import Analyzer
-from src.strategy import Strategy
+from BMPstat.bmpstat import BMPstat
 
 class Embedder:    
     """
     The Embedder class handles embedding a source image into a host image using LSB techniques.
-    It allows for setting the host image, defining the target layer for embedding, and embedding multiple images at specific locations.
+
+    Strategy:
+    * Embedding with accuracy factor
+    * RAW Embedding
+
     """
-
-    host_analyzer: Analyzer=None
-    host_layer: int=0
+    host: BMPstat=None
+    accuracy: int=35
     debug: bool=False
+    _RGB = ["R", "G", "B"]
 
-    def __init__(self, debug):
+    def __init__(self, host: BMPstat, debug):
+        self.host = host
         self.debug = debug
 
-    def set_host(self, host_analyzer: Analyzer):
-        """Assigns the host image analyzer."""
-        self.host_analyzer = host_analyzer
-        return self
+    def set_accuracy(self, value:int):
+        """
+            Embedding strategy accuracy in [0,100].
 
-    def set_host_layer(self, host_layer: int):
-        """Sets the LSB layer of the host image where the embedding will occur."""
-        if not self.host_analyzer.exist_layer(host_layer):
-            raise ValueError('Error: The specified embedding layer is out of bounds.')
-        self.host_layer = host_layer
-        return self
-    
-    def embedding(self, s_analyzers, s_layers, s_locations, strategy):
-        """Embeds multiple source images into the host image at specified locations using a given strategy."""
-        if self.host_analyzer is None:
+            if accuracy > 0:
+                * Embedding with accuracy factor
+                if factor(src_img[i,j]) > accuracy
+                    set_one
+                else
+                    set_zero
+            else
+                * RAW embedding
+        """
+        if value < 0 or value > 100:
+            raise ValueError('Error@Accuracy: the value is not valid. Set value in [0,100]')
+        self.accuracy = value
+
+    def get_factor(self, value: int):
+        # value : 255 = x : 100%
+        if not 0 <= value <= 255:
+            raise ValueError('Error@Factor: the value is not valid. Accepted value in [0,255]')
+        return value * 100 // 255 if value>0 else 0
+
+    def _debug(self, message: str):
+        if (self.debug):
+            print(message)
+
+    def check_not_null(self):
+        if self.host is None:
             raise ValueError('Error: No host image has been set for embedding.')
 
-        n = min(len(s_analyzers), len(s_layers), len(s_locations))
+    def check_not_null_src(self, img: BMPstat):
+        if img is None:
+            raise ValueError('Error: No source image has been set for embedding.')
 
-        if (self.debug):
-            print('\n' + '-' * 120)
-        for i in range(n):
-            ws, hs = s_locations[i]
+    # set LSB raw image to zero
+    def clean(self, layer: int, sublayer: int):
+        self.check_not_null()
+        """
+            Clean a layer by setting LSB to zero:
+            - Layer:    [ R G B ]
+            - Sublayer: [ 0 1 2 3 4 5 6 7 ]
+        """
+        width, height = self.host.get_size()
+        
+        for i in range(width):
+            for j in range(height):
+                self.host.set_zero(i, j, layer, sublayer)
+        
+        self._debug(f"The layer [{self._RGB[layer]},{sublayer}] is cleaned.")
+        
+        return self
+    
+    def embedding(self, layer, sublayer, src_img, src_layers, src_sublayers, pos):
+        """
+            The layer and sublayer of the host image.
+
+            Embeds multiple source images into the host image:
+            - Layers    [R,G,B]
+            - Sublayer  [0,1,2]
+            - positions [(x,y)] 
+
+            Note: If embedding fails, move on.
+        """
+        self.check_not_null()
+
+        self._debug('\n' + '-' * 120)
+
+        for i in range( min(len(src_img), len(src_layers), len(src_sublayers), len(pos)) ):
+            x, y = pos[i]
             try:
-                self._embedding(s_analyzers[i], strategy, s_layers[i], ws, hs)
-                if (self.debug):
-                    print(f'[+] Successfully embedded source {i}: Layer={s_layers[i]}, Position={s_locations[i]}, Strategy={strategy}')
+                self._embedding(layer, sublayer, src_img[i], src_layers[i], src_sublayers[i], x, y)
+            
+                self._debug(f'[+] Successfully embedded source {i}: Layer={self._RGB[src_layers[i]]}, Sublayer: {src_sublayers[i]}, Position={pos[i]}')
+            
             except Exception as e:
-                print(f'[-] Error embedding source {i}: Layer={s_layers[i]}, Position={s_locations[i]}, Strategy={strategy}')
+                print(f'[-] Error embedding source {i}: Layer={self._RGB[src_layers[i]]}, Sublayer: {src_sublayers[i]}, Position={pos[i]}')
                 print(f'    Exception: {e}')
                 print(f'    Skipping task {i}...')
-        if(self.debug):
-            print('-' * 120 + '\n')
-
-    def _embedding(self, s_analyzer: Analyzer, strategy: Strategy, s_layer=0, w_start=0, h_start=0):
-        """Handles the actual embedding process at the pixel level."""
-        if s_analyzer is None:
-            raise ValueError('Error: The source image analyzer is null.')
-
-        if not s_analyzer.exist_layer(s_layer):
-            raise ValueError('Error: The specified source layer is out of bounds.')
     
-        t_width, t_height = self.host_analyzer.get_size()
-        s_width, s_height = s_analyzer.get_size()
+        self._debug('-' * 120 + '\n')
 
-        # Validate start positions and sizes
+    def _embedding(self, layer: int, sublayer: int, src_img: BMPstat, s_layer=0, s_sublayer=0, w_start=0, h_start=0):
+        """
+            Handles the actual embedding process at the pixel level.
+        """
+        self.check_not_null()
+        self.check_not_null_src(src_img)
+        self.host.check_layer(layer)
+        self.host.check_sublayer(sublayer)
+        src_img.check_layer(s_layer)
+        src_img.check_sublayer(s_sublayer)
+
+        h_width, h_height = self.host.get_size()
+        s_width, s_height = src_img.get_size()
+
         if w_start < 0 or h_start < 0:
             raise ValueError(f"Error: Negative starting position ({w_start}, {h_start}) is not allowed.")
 
-        if t_width < w_start + s_width:
+        if h_width < w_start + s_width:
             raise ValueError(f"Error: Source image width ({s_width}) exceeds the host width. Reduce image size or adjust position.")
         
-        if t_height < h_start + s_height:
+        if h_height < h_start + s_height:
             raise ValueError(f"Error: Source image height ({s_height}) exceeds the host height. Reduce image size or adjust position.")
+ 
+        """
+            Strategies:
+                - Embedding with accuracy (default) (more perceptible)
+                - Embedding raw bit
+        """
+        strategy = self._accuracy_embedding
+        if self.accuracy == 0:
+            strategy = self._raw_embedding
         
-        # Retrieve host image properties
-        t_payload = self.host_analyzer.get_payload()
-        t_rowsize = self.host_analyzer.get_rowsize_Bpp()
-        t_padding = self.host_analyzer.get_padding()
-        t_Bpp = self.host_analyzer.get_Bpp()
+        strategy(layer, sublayer, src_img, s_layer, s_sublayer, w_start, h_start)
 
-        # Retrieve source image properties
-        s_payload = s_analyzer.get_payload()
-        s_rowsize = s_analyzer.get_rowsize_Bpp()
-        s_padding = s_analyzer.get_padding()
-        s_Bpp = s_analyzer.get_Bpp()
-
-        # Embedding loop
-        for h in range(s_height):
-            # Calculate row offsets
-            t_offset = (h + h_start) * (t_rowsize + t_padding) + w_start * t_Bpp
-            s_offset = h * (s_rowsize + s_padding)
-            
-            # Initialize channel indices
-            t_channel = t_offset + self.host_layer 
-            s_channel = s_offset + s_layer 
-            
-            for pixel in range(s_width):
-                # Apply the embedding strategy on the pixel
-                t_payload[t_channel] = strategy.apply(t_payload[t_channel], s_payload[s_channel])
-                # Move to the next pixel in the same channel
-                t_channel += t_Bpp
-                s_channel += s_Bpp
+    def _accuracy_embedding(self, layer: int, sublayer: int, src_img: BMPstat, s_layer=0, s_sublayer=0, w_start=0, h_start=0):
+        """
+            Embedding strategy:
+                Get value of src_img[x,y] pixel.
+                Get layer value of src_img[x,y] pixel.
                 
-        self.host_analyzer.set_payload(t_payload)
+                src_value = src_img[x,y][s_layer]
+                
+                If the factor of the src_value > accuracy value
+                    then
+                        set one to host[i,j][layer] to LSB[sublayer] bit.
+                else
+                    set zero to host[i,j][layer] to LSB[sublayer] bit.
+        """
+        s_width, s_height = src_img.get_size()
+        for i in range(s_width):
+            for j in range(s_height):
+                s_pixel = src_img.get_pixel_offset(i, j) + s_sublayer
+                value = src_img.raw_image[s_pixel]
+                if self.get_factor(value) < self.accuracy:
+                    self.host.set_zero(i + w_start, j + h_start, layer, sublayer)
+                else:
+                    self.host.set_one(i + w_start, j + h_start, layer, sublayer)
         return self
-    
-    # Note:
-    #   The following formula:
-    #       (h + h_start) * (t_rowsize + t_padding) 
-    #   determines the starting row (height) in the host image where the embedding begins.
-    #   Similarly, w_start defines the starting column (width) in the host image.
-    #
-    #   Example: (w_start, h_start) = (4, 5)
-    #
-    #   Visual Representation:
-    #
-    #   Height (rows)
-    #   6:      ...
-    #   5:      |               |*  <-- Embedding starts here
-    #   4:      ----------------------- ...
-    #   3:      |                   
-    #   2:      |       Pass (not modified)        
-    #   1:      |                   
-    #   0:      ----------------------- ...
-    #           0   1   2   3   4   ...     Width (columns)
-    #
-    #   - `h_start = 5` means the embedding starts at row 5 of the host image.
-    #   - `w_start = 4` means the embedding starts at column 4 of the host image.
-    #   - The asterisk (*) marks the exact pixel where the process begins.
-    #
-    #   The algorithm ensures that the embedding process does not exceed 
-    #   the boundaries of the host image.
 
+    def _raw_embedding(self, layer: int, sublayer: int, src_img: BMPstat, s_layer=0, s_sublayer=0, w_start=0, h_start=0):
+        """
+            Embedding strategy:
+                Get value of src_img[x,y] pixel.
+                Get layer value of src_img[x,y] pixel.
+                
+                src_value = src_img[x,y][s_layer]
+
+                Get sublayer of src_value.
+
+                src_lsb = src_img[x,y][s_layer][sub_layer]
+                
+                If src_lsb is 1
+                    then
+                        set one to host[i,j][layer] to LSB[sublayer] bit.
+                else
+                    set zero to host[i,j][layer] to LSB[sublayer] bit.
+        """
+        s_width, s_height = src_img.get_size()
+        for i in range(s_width):
+            for j in range(s_height):
+                s_pixel = src_img.get_pixel_offset(i, j) + s_sublayer
+                value = src_img.raw_image[s_pixel]
+                if value & 0X1:
+                    self.host.set_one(i + w_start, j + h_start, layer, sublayer)
+                else:
+                    self.host.set_zero(i + w_start, j + h_start, layer, sublayer)
+        return self
