@@ -151,8 +151,8 @@ class Embedder:
         s_width, s_height = src_img.get_size()
         for i in range(s_width):
             for j in range(s_height):
-                s_pixel = src_img.get_pixel_offset(i, j) + s_sublayer
-                value = src_img.raw_image[s_pixel]
+                s_pixel = src_img.get_pixel_offset(i, j)
+                value = src_img.raw_image[s_pixel + s_sublayer]
                 if self.get_factor(value) < self.accuracy:
                     self.host.set_zero(i + w_start, j + h_start, layer, sublayer)
                 else:
@@ -180,8 +180,8 @@ class Embedder:
         s_width, s_height = src_img.get_size()
         for i in range(s_width):
             for j in range(s_height):
-                s_pixel = src_img.get_pixel_offset(i, j) + s_sublayer
-                value = src_img.raw_image[s_pixel]
+                s_pixel = src_img.get_pixel_offset(i, j)
+                value = src_img.raw_image[s_pixel + s_sublayer]
                 if value & 0X1:
                     self.host.set_one(i + w_start, j + h_start, layer, sublayer)
                 else:
