@@ -50,7 +50,10 @@ Run the **run** script to embed a source image into a host image:
 ./run <host_image> <src_image> [-H <host_width>x<host_height>] [-S <src_width>x<src_height>]
 ```
 
-https://github.com/user-attachments/assets/471026d4-8060-478c-bf41-d0ec0e00c15c
+<p align="center">
+<img width="482" height="299" alt="Converter adn Embedder" src="https://github.com/user-attachments/assets/471026d4-8060-478c-bf41-d0ec0e00c15c" />
+</p>
+
 
 > Note: Ensure **imagemagick** is installed and properly configured.
 
