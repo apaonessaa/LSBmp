@@ -68,14 +68,6 @@ The result is the modified host image.
 
 The quality of the embedded information in the host image depends on several factors, including the embedding accuracy, the selected LSB layer, the number of altered bits, and the applied embedding strategy. These factors influence both the visibility of the embedded content and the preservation of the host image quality.
 
-## Roadmap
-
-- **Choose which LSB to alter**: Add for each RGB layer which bit you want to alter.
-- **Add alternative to the "cleaning" of the RGB layer with only zeros to increase the imperceptibility property of the watermark**.
-- **Multiple Source Images to Embedding**.
-- **Simplify Pipeline Definition**: via GUI?.
-- **Enhanced Error Handling**: Improve robustness in case of incorrect input parameters.
-
 ## License
 
 This project is licensed under the MIT License.
